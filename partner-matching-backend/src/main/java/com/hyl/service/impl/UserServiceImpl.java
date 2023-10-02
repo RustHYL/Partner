@@ -2,6 +2,8 @@ package com.hyl.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.hyl.common.ErrorCode;
 import com.hyl.exception.BusinessException;
 import com.hyl.model.entity.User;
@@ -11,13 +13,17 @@ import com.hyl.utils.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
 * @author Alan
@@ -164,6 +170,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setVerifyCode(originUser.getVerifyCode());
         safetyUser.setUserStatus(originUser.getUserStatus());
         safetyUser.setCreateTime(originUser.getCreateTime());
+        safetyUser.setTags(originUser.getTags());
         return safetyUser;
     }
 
@@ -181,11 +188,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 
     @Override
-    public int searchUserByTags(List<String> tagList){
-        if (tagList == null){
-            return 1;
+    public List<User> searchUserByTags(List<String> tagList){
+        if (CollectionUtils.isEmpty(tagList)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        return 0;
+        //数据库查询
+//        QueryWrapper queryWrapper = new QueryWrapper<>();
+//        //拼接and查询
+//        for (String tagName: tagList) {
+//            queryWrapper.like("tags", tagName);
+//        }
+//        List<User> list = userMapper.selectList(queryWrapper);
+        //内存查询
+        //1.先查询全部
+        QueryWrapper queryWrapper = new QueryWrapper<>();
+        List<User> list = userMapper.selectList(queryWrapper);
+        Gson gson = new Gson();
+        //2.内存中判断是否包含要求的标签（灵活）
+        for (User user : list) {
+            String tagStr = user.getTags();
+            Set<String> tempTagNameList = gson.fromJson(tagStr, new TypeToken<Set<User>>(){}.getType());
+            
+        }
+        return list.stream().map(this::getSafetyUser).collect(Collectors.toList());
     }
 
 

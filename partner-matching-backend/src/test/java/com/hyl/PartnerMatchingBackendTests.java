@@ -1,12 +1,18 @@
 package com.hyl;
 
+import com.hyl.model.entity.User;
+import com.hyl.service.UserService;
+import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.List;
 
 @SpringBootTest
-class partner-matching-backendApplicationTests {
+class PartnerMatchingBackendApplicationTests {
 
 
     @Resource
@@ -25,5 +31,13 @@ class partner-matching-backendApplicationTests {
         System.out.println(user.getId());
         Assertions.assertTrue(result);
     }
+
+    @Test
+    public void testSearchUserByTags(){
+        List<String> tagList = Arrays.asList("java","python");
+        List<User> userList = userService.searchUserByTags(tagList);
+        System.out.println(userList.size());
+    }
+
 
 }
