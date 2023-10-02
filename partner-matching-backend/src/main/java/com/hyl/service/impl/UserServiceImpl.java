@@ -18,7 +18,6 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -208,7 +207,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         for (User user : list) {
             String tagStr = user.getTags();
             Set<String> tempTagNameList = gson.fromJson(tagStr, new TypeToken<Set<User>>(){}.getType());
-            
+
         }
         return list.stream().map(this::getSafetyUser).collect(Collectors.toList());
     }
