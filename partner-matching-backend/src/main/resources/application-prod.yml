@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: hylSJ15214796392
+    url: 'jdbc:mysql://sh-cynosdbmysql-grp-0pie1j86.sql.tencentcdb.com:26873/universe?useSSL=false'
+    type: com.alibaba.druid.pool.DruidDataSource
+#  session失效时间
+  session:
+    timeout: 86400
+server:
+  port: 8080
+  servlet:
+    session:
+      cookie:
+        domain: 154.8.199.205
+        same-site: lax
+        secure: false
+
