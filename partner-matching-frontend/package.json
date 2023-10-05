@@ -11,7 +11,7 @@
   "dependencies": {
     "vant": "^4.7.0",
     "vue": "^3.3.4",
-    "vue-router": "4"
+    "vue-router": "4.2.5"
   },
   "devDependencies": {
     "@vant/auto-import-resolver": "^1.0.1",
