@@ -12,6 +12,7 @@ import com.hyl.model.entity.request.UserRegisterRequest;
 import com.hyl.service.UserService;
 import com.hyl.utils.Constant;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin
 public class UserController {
 
     @Resource
@@ -132,6 +134,15 @@ public class UserController {
         return ResultUtils.success(b);
     }
 
+    @GetMapping("/search/tags")
+    public BaseResponse<List<User>> searchUserByTags(@RequestParam(required = false) List<String> tagNameList){
+        if (CollectionUtils.isEmpty(tagNameList)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        List<User> userList = userService.searchUserByTags(tagNameList);
+        return ResultUtils.success(userList);
+    }
+
 
     /**
      * 是否为管理员
@@ -145,5 +156,7 @@ public class UserController {
         User user = (User) userObj;
         return user != null && user.getUserRole() == Constant.ADMIN_ROLE;
     }
+
+
 }
 

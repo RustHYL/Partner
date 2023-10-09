@@ -24,12 +24,15 @@
       :items="tagList"
   />
   <div style="padding: 12px">
-    <van-button block type="primary" >搜索</van-button>
+    <van-button block type="primary" @click="doSearchResult" >搜索</van-button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import {useRouter} from "vue-router";
+
+const router = useRouter();
 
 const searchText = ref('');
 
@@ -88,7 +91,14 @@ const doClose = (tag) => {
 /**
  * 执行搜索
  */
-
+const doSearchResult = () => {
+  router.push({
+    path: '/user/list',
+    query: {
+      tags: activeIds.value
+    }
+  })
+}
 
 </script>
 
