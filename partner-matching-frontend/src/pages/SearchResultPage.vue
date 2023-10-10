@@ -19,6 +19,7 @@
 import {onMounted, ref} from 'vue';
 import {useRoute} from "vue-router";
 import myAxios from "../plugins/myAxios.js"
+import qs from 'qs';
 
 const route = useRoute();
 
@@ -28,6 +29,9 @@ onMounted(() => {
   myAxios.get('/user/search/tags', {
     params: {
       tagNameList: tags
+    },
+    paramsSerializer: params => {
+      return qs.stringify(params, { indices: false })
     }
   })
   .then(function (response) {
