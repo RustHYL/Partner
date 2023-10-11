@@ -16,8 +16,7 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
-import myAxios from "../plugins/myAxios.ts";
-import {showFailToast} from "vant";
+import {getCurrentUser} from "../services/user.ts";
 //
 // const user = {
 //   id: 1,
@@ -35,12 +34,7 @@ import {showFailToast} from "vant";
 const user = ref()
 
 onMounted(async ()=>{
-  const res = await myAxios.get('/user/current')
-  if (res.code === 0){
-    user.value = res.data;
-  }else {
-    showFailToast('获取当前用户失败');
-  }
+  user.value = await getCurrentUser();
 })
 
 const router = useRouter();

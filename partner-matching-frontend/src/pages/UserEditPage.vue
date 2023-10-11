@@ -22,6 +22,7 @@ import {useRoute, useRouter} from "vue-router";
 import {ref} from "vue";
 import myAxios from "../plugins/myAxios.ts";
 import {showFailToast, showSuccessToast} from "vant";
+import {getCurrentUser} from "../services/user.ts";
 
 const route = useRoute();
 const router = useRouter();
@@ -30,12 +31,19 @@ const editUser = ref({
   editName: route.query.editName,
   currentValue: route.query.currentValue
 })
+
+
 const onSubmit = async () => {
-  //todo 把editKey,currentValue,editName提交到后台
+  //没返回id数据
+  const currentUser = await getCurrentUser();
+  if (!currentUser){
+    return;
+  }
   const res = await myAxios.post("/user/update", {
-    'id': 7,
+    'id': currentUser.id,
     [editUser.value.editKey as string]:editUser.value.currentValue
   })
+
   if (res.data > 0 && res.code === 0){
     router.back();
     showSuccessToast('更新成功');
