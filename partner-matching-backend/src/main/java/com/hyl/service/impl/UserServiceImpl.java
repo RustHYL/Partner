@@ -172,6 +172,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setUserStatus(originUser.getUserStatus());
         safetyUser.setCreateTime(originUser.getCreateTime());
         safetyUser.setTags(originUser.getTags());
+        safetyUser.setProfile(originUser.getProfile());
         return safetyUser;
     }
 
