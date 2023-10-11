@@ -9,7 +9,7 @@
     <van-cell title="电话" is-link :value="user.phone" @click="toEdit('phone','电话',user.phone)" />
     <van-cell title="邮箱" is-link :value="user.email" @click="toEdit('email','邮箱',user.email)" />
     <van-cell title="校验编号" :value="user.verifyCode" />
-    <van-cell title="注册时间" :value="user.createTime.toISOString()" />
+    <van-cell title="注册时间" :value="user.createTime" />
   </div>
 </template>
 

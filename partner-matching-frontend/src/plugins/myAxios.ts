@@ -5,8 +5,8 @@ const myAxios : AxiosInstance = axios.create({
     timeout: 1000,
 });
 
+myAxios.defaults.withCredentials = true
 
-myAxios.defaults.withCredentials = true; //后台发送请求的时候携带cookie
 
 // 添加请求拦截器
 myAxios.interceptors.request.use(function (config) {
