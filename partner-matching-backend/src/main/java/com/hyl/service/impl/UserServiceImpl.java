@@ -11,6 +11,7 @@ import com.hyl.service.UserService;
 import com.hyl.mapper.UserMapper;
 import com.hyl.utils.Constant;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -189,6 +190,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
 
+    /**
+     * 按照标签搜索永固
+     * @param tagList 标签列表
+     * @return
+     */
     @Override
     public List<User> searchUserByTags(List<String> tagList){
         if (CollectionUtils.isEmpty(tagList)) {
@@ -222,6 +228,70 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return true;
         }).map(this::getSafetyUser).collect(Collectors.toList());
 //        return list.stream().map(this::getSafetyUser).collect(Collectors.toList());
+    }
+
+    @Override
+    public int updateUser(User user, User loginUser) {
+        long userId = user.getId();
+        if (userId <= 0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //如果是管理员可以更新任意用户
+        if (isAdmin(loginUser)){
+            User oldUser = userMapper.selectById(userId);
+            if (oldUser == null){
+                throw new BusinessException(ErrorCode.PARAMS_NULL_ERROR);
+            }
+            return userMapper.updateById(user);
+        }
+        //如果是用户，只允许更新当前用户
+        if (userId != loginUser.getId()){
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        return userMapper.updateById(user);
+    }
+
+    /**
+     * 获取当前登录用户
+     * @param request
+     * @return
+     */
+    @Override
+    public User getLoginUser(HttpServletRequest request) {
+        if (request == null){
+            return null;
+        }
+        Object userObj = request.getSession().getAttribute(Constant.USER_LOGIN_STATE);
+        if (userObj == null) {
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        return (User) userObj;
+    }
+
+
+    /**
+     * 是否为管理员
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public boolean isAdmin(HttpServletRequest request) {
+        // 仅管理员可查询
+        Object userObj = request.getSession().getAttribute(Constant.USER_LOGIN_STATE);
+        User user = (User) userObj;
+        return user != null && user.getUserRole() == Constant.ADMIN_ROLE;
+    }
+
+    /**
+     * 是否为管理员(loginUser)
+     * @param loginUser
+     * @return
+     */
+    @Override
+    public boolean isAdmin(User loginUser) {
+        // 仅管理员可查询
+        return loginUser != null && loginUser.getUserRole() == Constant.ADMIN_ROLE;
     }
 
 

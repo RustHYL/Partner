@@ -2,6 +2,7 @@ package com.hyl.service;
 
 import com.hyl.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hyl.utils.Constant;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -52,4 +53,18 @@ public interface UserService extends IService<User> {
     int userLogout(HttpServletRequest request);
 
     List<User> searchUserByTags(List<String> tagList);
+
+    int updateUser(User user, User loginUser);
+
+    User getLoginUser(HttpServletRequest request);
+
+    /**
+     * 是否为管理员
+     *
+     * @param request
+     * @return
+     */
+    boolean isAdmin(HttpServletRequest request);
+
+    boolean isAdmin(User loginUser);
 }

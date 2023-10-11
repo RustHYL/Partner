@@ -3,12 +3,17 @@ server:
   port: 8080
   servlet:
     context-path: /api
+    session:
+      cookie:
+        domain: localhost
+
 #下面这些内容是为了让MyBatis映射
 #指定Mybatis的Mapper文件
 mybatis:
   mapper-locations: classpath:mappers/*xml
 #指定Mybatis的实体目录
   type-aliases-package: com.hyl.model.entity
+
 
 
 
@@ -24,6 +29,14 @@ spring:
 #  session失效时间
   session:
     timeout: 86400
+    store-type: redis
+  redis:
+    port: 6379
+    host: localhost
+    database: 0
+
+
+
 mybatis-plus:
   global-config:
     db-config:

@@ -1,5 +1,5 @@
 <template>
-  <div style="text-align: start">
+  <div style="text-align: start" v-if="user">
     <van-cell title="昵称" is-link :value="user.username" @click="toEdit('username','昵称',user.username)" />
     <van-cell title="用户账号" :value="user.userAccount" />
     <van-cell title="头像" is-link to="user/edit">
@@ -15,19 +15,33 @@
 
 <script setup lang="ts">
 import {useRouter} from "vue-router";
+import {onMounted, ref} from "vue";
+import myAxios from "../plugins/myAxios.ts";
+import {showFailToast} from "vant";
+//
+// const user = {
+//   id: 1,
+//   username: 'hapi',
+//   userAccount: '1257635375',
+//   avatarUrl: 'https://img1.baidu.com/it/u=3605832793,3252065221&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=1422',
+//   gender: 0,
+//   phone: 17815700343,
+//   email: '1257635375@qq.com',
+//   userRole: 1,
+//   verifyCode: '66645',
+//   createTime: new Date(),
+// }
 
-const user = {
-  id: 1,
-  username: 'hapi',
-  userAccount: '1257635375',
-  avatarUrl: 'https://img1.baidu.com/it/u=3605832793,3252065221&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=1422',
-  gender: 0,
-  phone: 17815700343,
-  email: '1257635375@qq.com',
-  userRole: 1,
-  verifyCode: '66645',
-  createTime: new Date(),
-}
+const user = ref()
+
+onMounted(async ()=>{
+  const res = await myAxios.get('/user/current')
+  if (res.code === 0){
+    user.value = res.data;
+  }else {
+    showFailToast('获取当前用户失败');
+  }
+})
 
 const router = useRouter();
 const toEdit = (editKey: string,editName: string, currentValue: string) => {

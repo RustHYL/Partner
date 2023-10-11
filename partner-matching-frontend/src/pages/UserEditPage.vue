@@ -18,18 +18,30 @@
 </template>
 
 <script setup lang="ts">
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {ref} from "vue";
+import myAxios from "../plugins/myAxios.ts";
+import {showFailToast, showSuccessToast} from "vant";
 
 const route = useRoute();
+const router = useRouter();
 const editUser = ref({
   editKey: route.query.editKey,
   editName: route.query.editName,
   currentValue: route.query.currentValue
 })
-const onSubmit = (values) => {
+const onSubmit = async () => {
   //todo 把editKey,currentValue,editName提交到后台
-  console.log('onSubmit',values);
+  const res = await myAxios.post("/user/update", {
+    'id': 7,
+    [editUser.value.editKey as string]:editUser.value.currentValue
+  })
+  if (res.data > 0 && res.code === 0){
+    router.back();
+    showSuccessToast('更新成功');
+  }else {
+    showFailToast('更新失败');
+  }
 };
 
 </script>

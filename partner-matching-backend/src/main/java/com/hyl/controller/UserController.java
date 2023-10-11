@@ -11,6 +11,7 @@ import com.hyl.model.entity.request.UserLoginRequest;
 import com.hyl.model.entity.request.UserRegisterRequest;
 import com.hyl.service.UserService;
 import com.hyl.utils.Constant;
+import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -107,10 +108,15 @@ public class UserController {
         return ResultUtils.success(safetyUser);
     }
 
-
+    /**
+     * 查找用户
+     * @param username 用户昵称
+     * @param request
+     * @return
+     */
     @GetMapping("/search")
     public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request) {
-        if (!isAdmin(request)) {
+        if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH, "缺少管理员权限");
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -122,9 +128,15 @@ public class UserController {
         return ResultUtils.success(users);
     }
 
+    /**
+     * 根据id删除用户
+     * @param id 用户id
+     * @param request
+     * @return
+     */
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
-        if (!isAdmin(request)) {
+        if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
         if (id <= 0) {
@@ -134,6 +146,11 @@ public class UserController {
         return ResultUtils.success(b);
     }
 
+    /**
+     * 根据标签查找用户
+     * @param tagNameList 标签列表
+     * @return
+     */
     @GetMapping("/search/tags")
     public BaseResponse<List<User>> searchUserByTags(@RequestParam(required = false) List<String> tagNameList){
         if (CollectionUtils.isEmpty(tagNameList)){
@@ -143,19 +160,20 @@ public class UserController {
         return ResultUtils.success(userList);
     }
 
-
-    /**
-     * 是否为管理员
-     *
-     * @param request
-     * @return
-     */
-    private boolean isAdmin(HttpServletRequest request) {
-        // 仅管理员可查询
-        Object userObj = request.getSession().getAttribute(Constant.USER_LOGIN_STATE);
-        User user = (User) userObj;
-        return user != null && user.getUserRole() == Constant.ADMIN_ROLE;
+    @PostMapping("/update")
+    public BaseResponse<Integer> updateUser(@RequestBody User user, HttpServletRequest request){
+        //1.校验参数是否为空
+        if (user == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //2.校验权限
+        User loginUser = userService.getLoginUser(request);
+        int result = userService.updateUser(user, loginUser);
+        return ResultUtils.success(result);
     }
+
+
+
 
 
 }
