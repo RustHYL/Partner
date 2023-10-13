@@ -35,5 +35,7 @@ const onChange = (index:any) => showToast(`标签 ${index}`);
 </script>
 
 <style>
-
+#content {
+  padding-bottom: 50px;
+}
 </style>

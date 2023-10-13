@@ -1,19 +1,6 @@
 <template>
-  <van-card
-      v-for="user in userList"
-      :desc="user.profile"
-      :title="`${user.username}\u3000\u3000 NO.${user.verifyCode}`"
-      :thumb="user.avatarUrl"
-      style="text-align: start"
-  >
-    <template #tags>
-      <van-tag plain type="primary" v-for="tag in user.tags" style="margin-right: 8px; margin-top: 8px">{{ tag }}</van-tag>
-    </template>
-    <template #footer>
-      <van-button size="mini">联系我</van-button>
-    </template>
-  </van-card>
-  <van-empty v-if="!userList || userList.length < 1" description="暂无数据" />
+  <user-card-list :user-list="userList" />
+  <van-empty v-if="!userList || userList.length < 1" description="数据为空" />
 </template>
 
 <script setup>
@@ -21,6 +8,7 @@ import {onMounted, ref} from 'vue';
 import {useRoute} from "vue-router";
 import myAxios from "../plugins/myAxios.ts"
 import qs from 'qs';
+import UserCardList from "../components/UserCardList.vue";
 
 const route = useRoute();
 
