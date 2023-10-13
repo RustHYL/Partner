@@ -236,6 +236,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (userId <= 0){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        //如果前端传入的user只有id属性直接error
+        if (StringUtils.isAllBlank(user.getUsername(),user.getAvatarUrl(),user.getPhone(),user.getEmail())
+                && user.getGender() == null){
+            throw new BusinessException(ErrorCode.PARAMS_NULL_ERROR);
+        }
         //如果是管理员可以更新任意用户
         if (isAdmin(loginUser) && userId != loginUser.getId()){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
