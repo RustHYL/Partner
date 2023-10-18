@@ -2,6 +2,8 @@ package com.hyl.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hyl.common.BaseResponse;
 import com.hyl.common.ErrorCode;
 import com.hyl.common.ResultUtils;
@@ -11,23 +13,30 @@ import com.hyl.model.entity.request.UserLoginRequest;
 import com.hyl.model.entity.request.UserRegisterRequest;
 import com.hyl.service.UserService;
 import com.hyl.utils.Constant;
-import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
+@Slf4j
 @CrossOrigin(origins = {"http://127.0.0.1:5173","http://localhost:5173","http://127.0.0.1:8080","http://localhost:8080"}, allowCredentials = "true")
 public class UserController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private RedisTemplate<String,Object> redisTemplate;
 
     /**
      * 用户注册
@@ -160,14 +169,41 @@ public class UserController {
         return ResultUtils.success(userList);
     }
 
+    /**
+     * 用户推荐
+     * @param pageSize 每页数量
+     * @param pageNum 页数
+     * @param request 请求
+     * @return pageUser
+     */
     @GetMapping("/recommend")
-    public BaseResponse<List<User>> recommendUsers(HttpServletRequest request) {
+    public BaseResponse<Page<User>> recommendUsers(int pageSize, int pageNum, HttpServletRequest request) {
+        ValueOperations<String,Object> valueOperations = redisTemplate.opsForValue();
+        User loginUser = userService.getLoginUser(request);
+        String redisKey = Constant.REDIS_RECOMMEND_PREFIX + loginUser.getId();
+        //如果有缓存先查询缓存
+        Page<User> userPage = (Page<User>) valueOperations.get(redisKey);
+        if (userPage != null){
+            return ResultUtils.success(userPage);
+        }
+        //无缓存查数据库
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        List<User> userList = userService.list(queryWrapper);
-        List<User> users = userList.stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
-        return ResultUtils.success(users);
+        userPage = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
+        //写缓存
+        try {
+            valueOperations.set(redisKey, userPage, Constant.REDIS_RECOMMEND_TIME, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            log.error("redis set key error");
+        }
+        return ResultUtils.success(userPage);
     }
 
+    /**
+     * 修改用户信息
+     * @param user 修改的信息
+     * @param request 请求
+     * @return 修改结果
+     */
     @PostMapping("/update")
     public BaseResponse<Integer> updateUser(@RequestBody User user, HttpServletRequest request){
         //1.校验参数是否为空

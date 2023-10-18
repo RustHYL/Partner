@@ -18,11 +18,14 @@ const userList = ref([]);
 
 onMounted(async () => {
   const userListData = await myAxios.get('/user/recommend', {
-    params: {},
+    params: {
+      pageNum:1,
+      pageSize:8
+    },
   })
       .then(function (response) {
         console.log('/user/recommend success', response);
-        return response.data;
+        return response?.data?.records;
       })
       .catch(function (error) {
         console.error('/user/recommend error', error);

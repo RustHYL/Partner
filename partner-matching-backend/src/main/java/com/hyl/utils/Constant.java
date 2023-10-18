@@ -29,4 +29,14 @@ public interface Constant {
      */
     public static final Integer DEFAULT_ROLE = 0;
 
+    /**
+     * Redis推荐key前缀
+     */
+    public static final String REDIS_RECOMMEND_PREFIX = "partner:recommend:";
+
+    /**
+     * Redis推荐过期时间
+     */
+    public static final Integer REDIS_RECOMMEND_TIME = 60;
+
 }
