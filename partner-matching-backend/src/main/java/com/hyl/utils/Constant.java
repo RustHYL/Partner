@@ -39,4 +39,9 @@ public interface Constant {
      */
     public static final Integer REDIS_RECOMMEND_TIME = 60;
 
+    /**
+     * Redis推荐key前缀
+     */
+    public static final String REDIS_RRECACHEJOB_PREFIX = "partner:precachejob:";
+
 }
