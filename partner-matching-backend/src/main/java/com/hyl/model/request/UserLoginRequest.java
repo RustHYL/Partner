@@ -1,4 +1,4 @@
-package com.hyl.model.entity.request;
+package com.hyl.model.request;
 
 import lombok.Data;
 

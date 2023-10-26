@@ -2,15 +2,14 @@ package com.hyl.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hyl.common.BaseResponse;
 import com.hyl.common.ErrorCode;
 import com.hyl.common.ResultUtils;
 import com.hyl.exception.BusinessException;
 import com.hyl.model.entity.User;
-import com.hyl.model.entity.request.UserLoginRequest;
-import com.hyl.model.entity.request.UserRegisterRequest;
+import com.hyl.model.request.UserLoginRequest;
+import com.hyl.model.request.UserRegisterRequest;
 import com.hyl.service.UserService;
 import com.hyl.utils.Constant;
 import lombok.extern.slf4j.Slf4j;
