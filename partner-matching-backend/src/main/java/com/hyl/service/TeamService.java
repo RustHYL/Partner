@@ -4,6 +4,8 @@ import com.hyl.model.dto.TeamQuery;
 import com.hyl.model.entity.Team;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hyl.model.entity.User;
+import com.hyl.model.request.TeamJoinRequest;
+import com.hyl.model.request.TeamQuitRequest;
 import com.hyl.model.request.TeamUpdateRequest;
 import com.hyl.model.vo.TeamUserVO;
 
@@ -38,4 +40,20 @@ public interface TeamService extends IService<Team> {
      * @return
      */
     boolean updateTeam(TeamUpdateRequest teamUpdateRequest, User loginUser);
+
+    /**
+     * 加入队伍
+     * @param teamJoinRequest
+     * @param loginUser
+     * @return
+     */
+    boolean joinTeam(TeamJoinRequest teamJoinRequest, User loginUser);
+
+    /**
+     * 退出队伍
+     * @param teamQuitRequest
+     * @param loginUser
+     * @return
+     */
+    boolean quitTeam(TeamQuitRequest teamQuitRequest, User loginUser);
 }
