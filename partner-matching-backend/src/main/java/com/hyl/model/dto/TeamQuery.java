@@ -45,4 +45,9 @@ public class TeamQuery extends PageRequest {
      */
     private Integer status;
 
+    /**
+     * 搜索关键词（对队伍名称和介绍搜索）
+     */
+    private String searchText;
+
 }

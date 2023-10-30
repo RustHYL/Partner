@@ -1,22 +1,22 @@
-package com.hyl.model.entity;
+package com.hyl.model.vo;
 
-import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
+import java.util.List;
 
 /**
- * 队伍
- * @TableName team
+ * 队伍和用户信息封装类（脱敏）
  */
-@TableName(value ="team")
 @Data
-public class Team implements Serializable {
+public class TeamUserVO implements Serializable {
+
+    private static final long serialVersionUID = 6501231939143991633L;
+
     /**
      * id
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -60,16 +60,13 @@ public class Team implements Serializable {
     private Date createTime;
 
     /**
-     * 更新时间
+     *更新时间
      */
     private Date updateTime;
 
-    /**
-     * 是否被删除
-     */
-    @TableLogic
-    private Integer isDelete;
 
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
+    /**
+     * 队伍的创建人信息
+     */
+    UserVO createUser;
 }

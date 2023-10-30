@@ -11,6 +11,8 @@ import com.hyl.model.dto.TeamQuery;
 import com.hyl.model.entity.Team;
 import com.hyl.model.entity.User;
 import com.hyl.model.request.TeamAddRequest;
+import com.hyl.model.request.TeamUpdateRequest;
+import com.hyl.model.vo.TeamUserVO;
 import com.hyl.service.TeamService;
 import com.hyl.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/team")
 @Slf4j
-@CrossOrigin(origins = {"http://127.0.0.1:5173","http://localhost:5173","http://127.0.0.1:8080","http://localhost:8080"}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://127.0.0.1:5173","http://localhost:5173","http://127.0.0.1:8080","http://localhost:8080"})
 public class TeamController {
 
 
@@ -34,11 +36,8 @@ public class TeamController {
     @Resource
     private TeamService teamService;
 
-    @Resource
-    private RedisTemplate<String,Object> redisTemplate;
-
     @PostMapping("/add")
-    public BaseResponse<Long> addTeam(@RequestParam TeamAddRequest teamAddRequest, HttpServletRequest request){
+    public BaseResponse<Long> addTeam(@RequestBody TeamAddRequest teamAddRequest, HttpServletRequest request){
         if (teamAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -50,7 +49,7 @@ public class TeamController {
     }
 
     @PostMapping("/delete")
-    public BaseResponse<Boolean> deleteTeam(@RequestParam long id){
+    public BaseResponse<Boolean> deleteTeam(@RequestBody long id){
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -62,11 +61,15 @@ public class TeamController {
     }
 
     @PutMapping("/update")
-    public BaseResponse<Boolean> updateTeam(@RequestParam Team team){
-        if (!(team != null)) {
+    public BaseResponse<Boolean> updateTeam(@RequestBody TeamUpdateRequest teamUpdateRequest, HttpServletRequest request){
+        if (teamUpdateRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        boolean update = teamService.updateById(team);
+        User loginUser = userService.getLoginUser(request);
+        if (loginUser == null){
+            throw new BusinessException(ErrorCode.NO_LOGIN);
+        }
+        boolean update = teamService.updateTeam(teamUpdateRequest, loginUser);
         if (!update){
             throw new BusinessException(ErrorCode.SYSTEM_ERROR,"队伍更新失败");
         }
@@ -74,7 +77,7 @@ public class TeamController {
     }
 
     @GetMapping("/get")
-    public BaseResponse<Team> getTeamById(@RequestParam long id){
+    public BaseResponse<Team> getTeamById(long id){
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -85,19 +88,30 @@ public class TeamController {
         return ResultUtils.success(team);
     }
 
+//    @GetMapping("/list")
+//    public BaseResponse<List<Team>> getTeamList(@RequestParam TeamQuery teamQuery){
+//        if (teamQuery == null) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+//        }
+//        Team team = BeanUtil.copyProperties(teamQuery, Team.class);
+//        QueryWrapper<Team> queryWrapper = new QueryWrapper<>(team);
+//        List<Team> list = teamService.list(queryWrapper);
+//        return ResultUtils.success(list);
+//    }
+
+
     @GetMapping("/list")
-    public BaseResponse<List<Team>> getTeamList(@RequestParam TeamQuery teamQuery){
+    public BaseResponse<List<TeamUserVO>> getTeamList(@RequestParam TeamQuery teamQuery,HttpServletRequest request){
         if (teamQuery == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Team team = BeanUtil.copyProperties(teamQuery, Team.class);
-        QueryWrapper<Team> queryWrapper = new QueryWrapper<>(team);
-        List<Team> list = teamService.list(queryWrapper);
+        boolean isAdmin = userService.isAdmin(request);
+        List<TeamUserVO> list = teamService.listTeams(teamQuery, isAdmin);
         return ResultUtils.success(list);
     }
 
     @GetMapping("/list/page")
-    public BaseResponse<Page<Team>> getTeamListByPage(@RequestParam TeamQuery teamQuery){
+    public BaseResponse<Page<Team>> getTeamListByPage(TeamQuery teamQuery){
         if (teamQuery == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }

@@ -1,22 +1,25 @@
-package com.hyl.model.entity;
+package com.hyl.model.vo;
 
-import com.baomidou.mybatisplus.annotation.*;
+
+
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
+
 
 /**
- * 用户
- * @TableName user
+ * 用户包装类（脱敏）
  */
-@TableName(value ="user")
+
 @Data
-public class User implements Serializable {
+public class UserVO implements Serializable {
+
+    private static final long serialVersionUID = -4663677866841230306L;
+
     /**
      * id
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -40,11 +43,6 @@ public class User implements Serializable {
     private Integer gender;
 
     /**
-     * 密码
-     */
-    private String userPassword;
-
-    /**
      * 电话
      */
     private String phone;
@@ -65,15 +63,10 @@ public class User implements Serializable {
     private Date createTime;
 
     /**
-     * 更新时间
+     *更新时间
      */
     private Date updateTime;
 
-    /**
-     * 是否被删除
-     */
-    @TableLogic
-    private Integer isDelete;
 
     /**
      * 用户角色 0普通用户 1管理员
@@ -95,6 +88,5 @@ public class User implements Serializable {
      */
     private String profile;
 
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
+
 }
