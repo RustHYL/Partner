@@ -50,7 +50,7 @@ knife4j:
   enable: true
   openapi:
     title: 用户中心-api文档
-    description: "用户中心**接口**文档"
+    description: "用户中心接口文档"
     email: 1257635375@qq.com
     concat: RugingHYL
     url: https://github.com/RustHYL

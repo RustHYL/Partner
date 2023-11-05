@@ -49,17 +49,7 @@ public class TeamController {
 
     }
 
-    @PostMapping("/delete")
-    public BaseResponse<Boolean> deleteTeam(@RequestBody long id){
-        if (id <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        boolean delete = teamService.removeById(id);
-        if (!delete){
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR,"队伍删除失败");
-        }
-        return ResultUtils.success(true);
-    }
+
 
     @PutMapping("/update")
     public BaseResponse<Boolean> updateTeam(@RequestBody TeamUpdateRequest teamUpdateRequest, HttpServletRequest request){
@@ -102,7 +92,7 @@ public class TeamController {
 
 
     @GetMapping("/list")
-    public BaseResponse<List<TeamUserVO>> getTeamList(@RequestParam TeamQuery teamQuery,HttpServletRequest request){
+    public BaseResponse<List<TeamUserVO>> getTeamList(TeamQuery teamQuery,HttpServletRequest request){
         if (teamQuery == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -143,6 +133,19 @@ public class TeamController {
         User loginUser = userService.getLoginUser(request);
         boolean result = teamService.quitTeam(teamQuitRequest, loginUser);
         return ResultUtils.success(result);
+    }
+
+    @PostMapping("/delete")
+    public BaseResponse<Boolean> deleteTeam(@RequestBody long id, HttpServletRequest request){
+        if (id <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        boolean delete = teamService.deleteTeam(id, loginUser);
+        if (!delete){
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR,"队伍删除失败");
+        }
+        return ResultUtils.success(true);
     }
 
 }

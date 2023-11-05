@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {UserType} from "../modules/user";
+import {UserType} from "../models/user";
 
 interface UserCardListProps {
   userList: UserType[];
