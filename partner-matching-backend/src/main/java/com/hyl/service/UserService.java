@@ -2,6 +2,7 @@ package com.hyl.service;
 
 import com.hyl.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hyl.model.vo.UserVO;
 import com.hyl.utils.Constant;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,12 +60,24 @@ public interface UserService extends IService<User> {
     User getLoginUser(HttpServletRequest request);
 
     /**
-     * 是否为管理员
-     *
+     * 是否为管理员（request）
      * @param request
      * @return
      */
     boolean isAdmin(HttpServletRequest request);
 
+    /**
+     * 是否是管理员（User）
+     * @param loginUser
+     * @return
+     */
     boolean isAdmin(User loginUser);
+
+    /**
+     * 匹配用户
+     * @param num
+     * @param loginUser
+     * @return
+     */
+    List<User> matchUser(long num, User loginUser);
 }

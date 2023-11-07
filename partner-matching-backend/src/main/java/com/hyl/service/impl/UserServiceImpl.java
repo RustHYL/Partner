@@ -1,17 +1,22 @@
 package com.hyl.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.hyl.common.ErrorCode;
 import com.hyl.exception.BusinessException;
 import com.hyl.model.entity.User;
+import com.hyl.model.vo.UserVO;
 import com.hyl.service.UserService;
 import com.hyl.mapper.UserMapper;
+import com.hyl.utils.AlgorithmUtils;
 import com.hyl.utils.Constant;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import net.bytebuddy.description.method.MethodDescription;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -19,13 +24,11 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
 * @author Alan
@@ -293,6 +296,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public boolean isAdmin(User loginUser) {
         // 仅管理员可查询
         return loginUser != null && loginUser.getUserRole() == Constant.ADMIN_ROLE;
+    }
+
+    @Override
+    public List<User> matchUser(long num, User loginUser) {
+        List<User> userList = this.list();
+        String loginUserTags = loginUser.getTags();
+        Gson gson = new Gson();
+        List<String> loginUserTagsList = gson.fromJson(loginUserTags, new TypeToken<List<String>>() {
+        }.getType());
+        SortedMap<Integer, Long> similarityMap = new TreeMap<>();
+        int i;
+        for (i = 0; i < userList.size(); i++){
+            User user = userList.get(i);
+            String userTags = user.getTags();
+            if (StringUtils.isBlank(userTags)) {
+                continue;
+            }
+            List<String> userTagsList = gson.fromJson(userTags, new TypeToken<List<String>>() {
+            }.getType());
+            long score = AlgorithmUtils.minDistance(loginUserTagsList, userTagsList);
+            similarityMap.put(i, score);
+        }
+        List<Integer> similarUserList = similarityMap.keySet().stream().limit(num).collect(Collectors.toList());
+        List<User> indexSimilarList = similarUserList.stream().map(index -> getSafetyUser(userList.get(index))).collect(Collectors.toList());
+//        for (Integer index : similarUserList) {
+//            User safetyUser = getSafetyUser(userList.get(index));
+//            userVOList.add(BeanUtil.copyProperties(safetyUser, UserVO.class));
+//        }
+        return indexSimilarList;
     }
 
 

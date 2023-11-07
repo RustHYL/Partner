@@ -10,6 +10,7 @@ import com.hyl.exception.BusinessException;
 import com.hyl.model.entity.User;
 import com.hyl.model.request.UserLoginRequest;
 import com.hyl.model.request.UserRegisterRequest;
+import com.hyl.model.vo.UserVO;
 import com.hyl.service.UserService;
 import com.hyl.utils.Constant;
 import lombok.extern.slf4j.Slf4j;
@@ -215,6 +216,22 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
+    /**
+     * 获取最匹配的用户
+     * @param num
+     * @param request
+     * @return
+     */
+    @GetMapping("/match")
+    public BaseResponse<User> recommendUsers(long num, HttpServletRequest request) {
+        if (num <= 0 || num > 20) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        List<User> userList = userService.matchUser(num,loginUser);
+        return ResultUtils.success(userList);
+    }
 
-}
+
+    }
 

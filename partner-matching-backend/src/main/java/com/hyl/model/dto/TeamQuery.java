@@ -6,6 +6,8 @@ import com.hyl.common.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 
 /**
  * 队伍查询请求封装类
@@ -14,10 +16,17 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class TeamQuery extends PageRequest {
+    private static final long serialVersionUID = 1475517866575099437L;
     /**
      * id
      */
     private Long id;
+
+    /**
+     * id 列表
+     */
+    private List<Long> idList;
+
 
     /**
      * 队伍名称
