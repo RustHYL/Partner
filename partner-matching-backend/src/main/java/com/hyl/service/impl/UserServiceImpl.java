@@ -1,34 +1,28 @@
 package com.hyl.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Pair;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.hyl.common.ErrorCode;
 import com.hyl.exception.BusinessException;
 import com.hyl.model.entity.User;
-import com.hyl.model.vo.UserVO;
 import com.hyl.service.UserService;
 import com.hyl.mapper.UserMapper;
 import com.hyl.utils.AlgorithmUtils;
 import com.hyl.utils.Constant;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import net.bytebuddy.description.method.MethodDescription;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
 * @author Alan
@@ -230,7 +224,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             }
             return true;
         }).map(this::getSafetyUser).collect(Collectors.toList());
-//        return list.stream().map(this::getSafetyUser).collect(Collectors.toList());
     }
 
     @Override
@@ -284,7 +277,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 仅管理员可查询
         Object userObj = request.getSession().getAttribute(Constant.USER_LOGIN_STATE);
         User user = (User) userObj;
-        return user != null && user.getUserRole() == Constant.ADMIN_ROLE;
+        return user != null && Objects.equals(user.getUserRole(), Constant.ADMIN_ROLE);
     }
 
     /**
@@ -295,37 +288,58 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public boolean isAdmin(User loginUser) {
         // 仅管理员可查询
-        return loginUser != null && loginUser.getUserRole() == Constant.ADMIN_ROLE;
+        return loginUser != null && Objects.equals(loginUser.getUserRole(), Constant.ADMIN_ROLE);
     }
 
     @Override
     public List<User> matchUser(long num, User loginUser) {
-        List<User> userList = this.list();
-        String loginUserTags = loginUser.getTags();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id", "tags");
+        queryWrapper.isNotNull("tags");
+        List<User> userList = this.list(queryWrapper);
+        String tags = loginUser.getTags();
         Gson gson = new Gson();
-        List<String> loginUserTagsList = gson.fromJson(loginUserTags, new TypeToken<List<String>>() {
+        List<String> tagList = gson.fromJson(tags, new TypeToken<List<String>>() {
         }.getType());
-        SortedMap<Integer, Long> similarityMap = new TreeMap<>();
-        int i;
-        for (i = 0; i < userList.size(); i++){
+        // 用户列表的下标 => 相似度
+        List<Pair<User, Long>> list = new ArrayList<>();
+        // 依次计算所有用户和当前用户的相似度
+        for (int i = 0; i < userList.size(); i++) {
             User user = userList.get(i);
             String userTags = user.getTags();
-            if (StringUtils.isBlank(userTags)) {
+            // 无标签或者为当前用户自己
+            if (StringUtils.isBlank(userTags) || Objects.equals(user.getId(), loginUser.getId())) {
                 continue;
             }
-            List<String> userTagsList = gson.fromJson(userTags, new TypeToken<List<String>>() {
+            List<String> userTagList = gson.fromJson(userTags, new TypeToken<List<String>>() {
             }.getType());
-            long score = AlgorithmUtils.minDistance(loginUserTagsList, userTagsList);
-            similarityMap.put(i, score);
+            // 计算分数
+            long distance = AlgorithmUtils.minDistance(tagList, userTagList);
+            list.add(new Pair<>(user, distance));
         }
-        List<Integer> similarUserList = similarityMap.keySet().stream().limit(num).collect(Collectors.toList());
-        List<User> indexSimilarList = similarUserList.stream().map(index -> getSafetyUser(userList.get(index))).collect(Collectors.toList());
-//        for (Integer index : similarUserList) {
-//            User safetyUser = getSafetyUser(userList.get(index));
-//            userVOList.add(BeanUtil.copyProperties(safetyUser, UserVO.class));
-//        }
-        return indexSimilarList;
+        // 按编辑距离由小到大排序
+        List<Pair<User, Long>> topUserPairList = list.stream()
+                .sorted((a, b) -> (int) (a.getValue() - b.getValue()))
+                .limit(num)
+                .collect(Collectors.toList());
+        // 原本顺序的 userId 列表
+        List<Long> userIdList = topUserPairList.stream().map(pair -> pair.getKey().getId()).collect(Collectors.toList());
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.in("id", userIdList);
+        // 1, 3, 2
+        // User1、User2、User3
+        // 1 => User1, 2 => User2, 3 => User3
+        Map<Long, List<User>> userIdUserListMap = this.list(userQueryWrapper)
+                .stream()
+                .map(this::getSafetyUser)
+                .collect(Collectors.groupingBy(User::getId));
+        List<User> finalUserList = new ArrayList<>();
+        for (Long userId : userIdList) {
+            finalUserList.add(userIdUserListMap.get(userId).get(0));
+        }
+        return finalUserList;
     }
+
 
 
 }

@@ -105,10 +105,10 @@ const doDeleteTeam = async (id: number) => {
       </template>
 
       <template #footer>
-        <van-button type="primary" @click="doJoinTeam(team.id)" size="small">加入队伍</van-button>
-        <van-button v-if="team.userId === currentUser?.id" type="primary" @click="doUpdateTeam(team.id)" size="small">更新队伍</van-button>
-        <van-button type="primary" @click="doQuitTeam(team.id)" size="small">退出队伍</van-button>
-        <van-button v-if="team.userId === currentUser?.id" type="primary" @click="doDeleteTeam(team.id)" size="small">解散队伍</van-button>
+        <van-button v-if="team.userId !== currentUser?.id && !team.hasJoin" type="primary" plain @click="doJoinTeam(team.id)" size="small">加入队伍</van-button>
+        <van-button v-if="team.userId === currentUser?.id" plain @click="doUpdateTeam(team.id)" size="small">更新队伍</van-button>
+        <van-button plain v-if="team.userId !== currentUser?.id && team.hasJoin" @click="doQuitTeam(team.id)" size="small">退出队伍</van-button>
+        <van-button v-if="team.userId === currentUser?.id" type="danger" plain @click="doDeleteTeam(team.id)" size="small">解散队伍</van-button>
       </template>
     </van-card>
   </div>

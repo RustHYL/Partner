@@ -177,7 +177,7 @@ public class UserController {
      * @return pageUser
      */
     @GetMapping("/recommend")
-    public BaseResponse<Page<User>> recommendUsers(int pageSize, int pageNum, HttpServletRequest request) {
+    public BaseResponse<Page<User>> selectUsers(int pageSize, int pageNum, HttpServletRequest request) {
         ValueOperations<String,Object> valueOperations = redisTemplate.opsForValue();
         User loginUser = userService.getLoginUser(request);
         String redisKey = Constant.REDIS_RECOMMEND_PREFIX + loginUser.getId();
@@ -223,13 +223,12 @@ public class UserController {
      * @return
      */
     @GetMapping("/match")
-    public BaseResponse<User> recommendUsers(long num, HttpServletRequest request) {
+    public BaseResponse<List<User>> recommendUsers(long num, HttpServletRequest request) {
         if (num <= 0 || num > 20) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User loginUser = userService.getLoginUser(request);
-        List<User> userList = userService.matchUser(num,loginUser);
-        return ResultUtils.success(userList);
+        return ResultUtils.success(userService.matchUser(num, loginUser));
     }
 
 

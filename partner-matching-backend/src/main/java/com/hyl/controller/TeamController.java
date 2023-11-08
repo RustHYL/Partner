@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -110,6 +111,20 @@ public class TeamController {
         //1.查询队伍列表
         List<TeamUserVO> list = teamService.listTeams(teamQuery, isAdmin);
         final List<Long> teamIdList = list.stream().map(TeamUserVO::getId).collect(Collectors.toList());
+        QueryWrapper<UserTeam> queryWrapper = new QueryWrapper<>();
+        try {
+            User loginUser = userService.getLoginUser(request);
+            queryWrapper.eq("user_id",loginUser.getId());
+            queryWrapper.in("team_id",teamIdList);
+            List<UserTeam> userTeamList = userTeamService.list(queryWrapper);
+            Set<Long> hasJoinTeamSet = userTeamList.stream().map(UserTeam::getTeamId).collect(Collectors.toSet());
+            list.forEach(team ->{
+                boolean hasJoin = hasJoinTeamSet.contains(team.getId());
+                team.setHasJoin(hasJoin);
+            });
+        } catch (Exception e){
+
+        }
         return ResultUtils.success(list);
     }
 

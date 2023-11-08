@@ -2,7 +2,7 @@ import axios, {AxiosInstance} from "axios";
 
 const myAxios : AxiosInstance = axios.create({
     baseURL: 'http://localhost:8080/api/',
-    timeout: 1000,
+    timeout: 100000,
 });
 
 myAxios.defaults.withCredentials = true

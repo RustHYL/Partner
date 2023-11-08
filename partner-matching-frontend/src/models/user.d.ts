@@ -15,5 +15,5 @@ export type UserType = {
     userRole: number;
     verifyCode: string;
     createTime: Date;
-    tags: string[];
+    tags: string;
 };
