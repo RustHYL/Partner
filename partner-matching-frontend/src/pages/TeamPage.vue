@@ -17,11 +17,12 @@ const doCreateTeam = () =>{
   })
 }
 
-const listTeam = async (val = '') => {
+const listTeam = async (val = '', status = 0) => {
   const res = await myAxios.get("/team/list", {
     params: {
       searchText: val,
       pageNum: 1,
+      status,
     }
   });
   if (res?.code === 0) {
@@ -34,6 +35,15 @@ const onSearch = (val) => {
   listTeam(val);
 };
 
+const active = ref('public');
+
+const onTabChange = (name) => {
+  if (name === 'public'){
+    listTeam(searchText.value, 0);
+  }else {
+    listTeam(searchText.value, 2);
+  }
+}
 
 onMounted(() => {
   listTeam();
@@ -43,9 +53,14 @@ onMounted(() => {
 <template>
   <div id="teamPage">
     <van-search v-model="searchText" placeholder="搜索队伍" @search="onSearch"/>
-    <van-button type="primary" @click="doCreateTeam">创建队伍</van-button>
+    <van-tabs v-model:active="active" @change="onTabChange">
+      <van-tab title="公开" name="public"/>
+      <van-tab title="加密" name="private"/>
+    </van-tabs>
+    <div style="margin-bottom: 12px"/>
     <team-card-list :teamList="teamList" />
     <van-empty v-if="!teamList || teamList.length < 1" description="数据为空" />
+    <van-button type="primary" icon="plus" style="position: fixed; bottom: 60px; right: 12px; height: 50px; width: 50px; border-radius: 50%" @click="doCreateTeam"/>
   </div>
 </template>
 

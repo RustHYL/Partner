@@ -27,12 +27,13 @@
 </template>
 
 <script setup lang="ts">
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {ref} from "vue";
 import myAxios from "../plugins/myAxios";
 import {showFailToast, showSuccessToast} from "vant";
 
 const router = useRouter();
+const route = useRoute();
 const userAccount = ref('');
 const userPassword = ref('');
 const onSubmit = async () => {
@@ -43,7 +44,8 @@ const onSubmit = async () => {
   console.log(res,'用户登录');
   if (res.data && res.code === 0){
     showSuccessToast('登录成功');
-    router.replace('/')
+    const redirectUrl = route.query?.redirect as string ?? '/';
+    window.location.href = redirectUrl;
   }else {
     showFailToast('登录失败');
   }

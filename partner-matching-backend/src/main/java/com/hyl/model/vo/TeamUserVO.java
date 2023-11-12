@@ -68,7 +68,12 @@ public class TeamUserVO implements Serializable {
     /**
      * 队伍的创建人信息
      */
-    UserVO createUser;
+    private UserVO createUser;
+
+    /**
+     * 加入用户数
+     */
+    private Integer hasJoinNum = 0;
 
     /**
      * 是否已加入该队伍

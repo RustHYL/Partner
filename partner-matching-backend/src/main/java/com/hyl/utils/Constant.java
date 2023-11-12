@@ -45,6 +45,11 @@ public interface Constant {
     public static final String REDIS_RRECACHEJOB_PREFIX = "partner:precachejob:";
 
     /**
+     * 加入队伍锁key
+     */
+    public static final String JOIN_TEAM_PREFIX = "partner:join_team";
+
+    /**
      * 单人队伍限制个数
      */
     public static final long PERSONAL_TEAM_MAX_COUNT = 5L;

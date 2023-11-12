@@ -24,23 +24,47 @@ onMounted(async () => {
   currentUser.value = await getCurrentUser();
 })
 
+const showPasswordDialog = ref(false);
+
+const password = ref('');
+
+const joinTeamId = ref(0);
+
+const preJoinTeam = (team: TeamType) => {
+  joinTeamId.value = team.id;
+  if (team.status === 0 || team.status === 1){
+    doJoinTeam()
+  } else {
+    showPasswordDialog.value = true;
+  }
+}
+
 /**
  * 加入队伍
- * @param id
  */
-const doJoinTeam = async (id: number) => {
+const doJoinTeam = async () => {
+  if (!joinTeamId.value){
+    return;
+  }
   const res = await myAxios.post('team/join', {
-    teamId: id
+    teamId: joinTeamId.value,
+    password: password.value,
   });
   if (res.code === 0){
-    showSuccessToast("加入成功")
+    doClear();
+    location.reload();
   } else {
     showFailToast('加入失败' + (res.description ? `，${res.description}` : ''))
   }
 }
 
+const doClear = () =>{
+  joinTeamId.value = 0;
+  password.value = '';
+}
+
 const doUpdateTeam = async (id: number) => {
-  router.push({
+  await router.push({
     path: 'team/update',
     query: {
       id,
@@ -57,7 +81,7 @@ const doQuitTeam = async (id: number) => {
     teamId: id
   });
   if (res.code === 0){
-    showSuccessToast("操作成功")
+    location.reload();
   } else {
     showFailToast('操作失败' + (res.description ? `，${res.description}` : ''))
   }
@@ -72,7 +96,7 @@ const doDeleteTeam = async (id: number) => {
     id,
   });
   if (res.code === 0){
-    showSuccessToast("操作成功")
+    location.reload();
   } else {
     showFailToast('操作失败' + (res.description ? `，${res.description}` : ''))
   }
@@ -94,7 +118,7 @@ const doDeleteTeam = async (id: number) => {
       </template>
       <template #bottom>
         <div>
-          {{ '最大人数: ' + team.maxNum }}
+          {{ `队伍人数: ${team.hasJoinNum}/${team.maxNum}` }}
         </div>
         <div v-if="team.expireTime">
           {{ '过期时间: ' + team.expireTime }}
@@ -105,12 +129,16 @@ const doDeleteTeam = async (id: number) => {
       </template>
 
       <template #footer>
-        <van-button v-if="team.userId !== currentUser?.id && !team.hasJoin" type="primary" plain @click="doJoinTeam(team.id)" size="small">加入队伍</van-button>
+        <van-button v-if="team.userId !== currentUser?.id && !team.hasJoin" size="small" type="primary" plain
+                    @click="preJoinTeam(team)">加入队伍</van-button>
         <van-button v-if="team.userId === currentUser?.id" plain @click="doUpdateTeam(team.id)" size="small">更新队伍</van-button>
         <van-button plain v-if="team.userId !== currentUser?.id && team.hasJoin" @click="doQuitTeam(team.id)" size="small">退出队伍</van-button>
         <van-button v-if="team.userId === currentUser?.id" type="danger" plain @click="doDeleteTeam(team.id)" size="small">解散队伍</van-button>
       </template>
     </van-card>
+    <van-dialog v-model:show="showPasswordDialog" title="填写密码" show-cancel-button @confirm="doJoinTeam()" @cancel="doClear">
+      <van-field v-model="password" placeholder="请输入密码" />
+    </van-dialog>
   </div>
 </template>
 
