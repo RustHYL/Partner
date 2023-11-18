@@ -1,7 +1,9 @@
 import axios, {AxiosInstance} from "axios";
 
+const isDev = process.env.NODE_ENV === 'development';
+
 const myAxios : AxiosInstance = axios.create({
-    baseURL: 'http://localhost:8080/api/',
+    baseURL: isDev ? 'http://localhost:8080/api/' : 'xxx',
     timeout: 100000,
 });
 

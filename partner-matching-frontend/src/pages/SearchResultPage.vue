@@ -3,7 +3,7 @@
   <van-empty v-if="!userList || userList.length < 1" description="暂无数据" />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {onMounted, ref} from 'vue';
 import {useRoute} from "vue-router";
 import myAxios from "../plugins/myAxios.ts"

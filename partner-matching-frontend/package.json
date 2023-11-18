@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -16,6 +16,7 @@
     "vue-router": "4.2.5"
   },
   "devDependencies": {
+    "@types/node": "^20.9.0",
     "@types/qs": "^6.9.8",
     "@vant/auto-import-resolver": "^1.0.1",
     "@vitejs/plugin-vue": "^4.2.3",

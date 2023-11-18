@@ -57,6 +57,13 @@
   "resolved" "https://registry.npmmirror.com/@types/estree/-/estree-1.0.2.tgz"
   "version" "1.0.2"
 
+"@types/node@^20.9.0", "@types/node@>= 14":
+  "integrity" "sha512-nekiGu2NDb1BcVofVcEKMIwzlx4NjHlcjhoxxKBNLtz15Y1z7MYf549DFvkHSId02Ax6kGwWntIBPC3l/JZcmw=="
+  "resolved" "https://registry.npmmirror.com/@types/node/-/node-20.9.0.tgz"
+  "version" "20.9.0"
+  dependencies:
+    "undici-types" "~5.26.4"
+
 "@types/qs@^6.9.8":
   "integrity" "sha512-u95svzDlTysU5xecFNTgfFG5RUWu1A9P0VzgpcIiGZA9iraHOdSzcxMxQ55DyeRaGCSxQi7LxXDI4rzq/MYfdg=="
   "resolved" "https://registry.npmmirror.com/@types/qs/-/qs-6.9.8.tgz"
@@ -659,6 +666,11 @@
   "integrity" "sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w=="
   "resolved" "https://registry.npmmirror.com/typescript/-/typescript-5.2.2.tgz"
   "version" "5.2.2"
+
+"undici-types@~5.26.4":
+  "integrity" "sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA=="
+  "resolved" "https://registry.npmmirror.com/undici-types/-/undici-types-5.26.5.tgz"
+  "version" "5.26.5"
 
 "unplugin-vue-components@^0.25.2":
   "integrity" "sha512-OVmLFqILH6w+eM8fyt/d/eoJT9A6WO51NZLf1vC5c1FZ4rmq2bbGxTy8WP2Jm7xwFdukaIdv819+UI7RClPyCA=="
